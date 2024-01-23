@@ -1,0 +1,30 @@
+@startuml
+
+namespace Category {
+    enum Type {
+        None
+        Scene
+        Player
+        FriendlyNPC
+        EnemyNPC
+    }
+}
+
+enum Type {
+    Player
+    Bunny
+    Bear
+}
+
+object Entity {
+    m_velocity
+}
+
+object Creature {
+    m_type
+    m_sprite
+}
+
+Entity --> Creature
+
+@enduml

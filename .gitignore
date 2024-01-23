@@ -1,0 +1,5 @@
+build
+debug
+bin
+dep/SFML-2.6.1
+modules
