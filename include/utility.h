@@ -15,6 +15,12 @@ struct ImButton {
     float count = 0.f;
 };
 
+/**
+ * Centers the origin of the sprite to the center of the sprite (as opposed to
+ * the top left corner).
+ * @param sf::Sprite& object
+ * @return void return
+ */
 void center_origin(sf::Sprite& sprite);
 void center_origin(sf::Text& text);
 void scale_sprite(sf::Sprite& sprite);

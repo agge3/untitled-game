@@ -1,3 +1,11 @@
+/**
+ * @project untitled game
+ * @copyright See LICENSE in the top level directory
+ * @file main.cpp
+ * @purpose A fun and untitled game
+ * @developers agge3
+ */
+
 #include "app.h"
 
 #include <stdexcept>

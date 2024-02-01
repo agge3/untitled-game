@@ -52,10 +52,14 @@ std::vector<ProjectileData> initialize_projectile_data()
 {
     std::vector<ProjectileData> data(Projectile::TypeCount);
 
+    /** @brief Projectile::PlayerFire does 5.f damage, has 200.f speed, and
+     * texture is Textures::FireProjectile */
     data[Projectile::PlayerFire].damage = 5.f;
     data[Projectile::PlayerFire].speed = 200.f;
     data[Projectile::PlayerFire].texture = Textures::FireProjectile;
 
+    /** @brief Projectile::EnemyFire does 5.f damage, has 200.f speed, and
+     * texture is Textures::FireProjectile */
     data[Projectile::EnemyFire].damage = 5.f;
     data[Projectile::EnemyFire].speed = 200.f;
     data[Projectile::EnemyFire].texture = Textures::FireProjectile;
