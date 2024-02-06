@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
 World::World(sf::RenderWindow& window, FontHolder& fonts) :
     // initialize all parts of the world correctly
@@ -46,10 +47,12 @@ void World::update(sf::Time delta_time)
     m_world_view.move(0.f, m_scroll_speed * delta_time.asSeconds());
     m_player_creature->set_velocity(0.f, 0.f);
 
-    /// Setup commands to destroy entities if outside world chunk.
+    /** @brief Setup commands to destroy entities if outside world chunk.
+     * @warning NOT USED. */
     //destroy_entities_outside_chunk();
 
-    /// Forward commands to the scene graph and adapt player velocity correctly.
+    /** @brief Forward commands to the scene graph and adapt player velocity
+     * correctly. */
     while (!m_command_queue.is_empty())
         m_scene_graph.on_command(m_command_queue.pop(), delta_time);
     adapt_player_velocity();
@@ -130,8 +133,8 @@ void World::build_scene()
 void World::adapt_player_position()
 {
     /// Initialize view bounds to world view.
-  	sf::FloatRect view_bounds(m_world_view.getCenter() - m_world_view.getSize() / 2.f,
-            m_world_view.getSize());
+  	sf::FloatRect view_bounds(m_world_view.getCenter()
+            - m_world_view.getSize() / 2.f, m_world_view.getSize());
     /// Initialize distance from "border" (before view pan).
     // what distance from border before panning view? 16.f = 16px
 	constexpr float border_distance = 16.f;
@@ -161,6 +164,9 @@ void World::adapt_player_position()
 
     /// Set player position to current position.
 	m_player_creature->setPosition(position);
+
+    // uncomment to print current player pos
+    std::cout << "Player position: (" << position.x << ", " << position.y << ")\n";
 }
 
 void World::adapt_player_velocity()
@@ -168,7 +174,7 @@ void World::adapt_player_velocity()
     sf::Vector2f velocity = m_player_creature->get_velocity();
 
     // if moving diagonally, reduce velocity (to always have same velocity)
-    if(velocity.x != 0.f && velocity.y != 0.f)
+    if (velocity.x != 0.f && velocity.y != 0.f)
         m_player_creature->set_velocity(velocity / std::sqrt(2.f));
 
     // add scrolling velocity
@@ -178,8 +184,7 @@ void World::adapt_player_velocity()
 /**
  * Spawns NPCs from m_npc_spawn_points.
  * @see add_npcs().
- * @note Assumes m_npc_spawn_points is sorted i650           1837
-C/C++ Header                     1              0              1   n ascending order. Iterating
+ * @note Assumes m_npc_spawn_points is sorted in ascending order. Iterating
  * from lowest to highest coordinates is more likely to be the common case.
  */
 void World::spawn_npcs()
@@ -222,37 +227,49 @@ void World::spawn_npcs()
         }
     }
     */
-    // print size of npc spawn points vector, for debug
-    std::cout << "Size of npc spawn points vector: " << m_npc_spawn_points.size()
-        << "\n";
     // if npc spawn points vector is not empty...
     if (!m_npc_spawn_points.empty()) {
         // iter through each spawn point and spawn
         for (auto iter = m_npc_spawn_points.rbegin();
                 iter != m_npc_spawn_points.rend(); ++iter) {
-            // print each iter to confirm with size, for debug
-            //std::cout << m_npc_spawn_points.at(iter) << "\n";
             // init SpawnPoint AFTER check to not create unneccesary structs
             SpawnPoint spawn = *iter;
             // create smart ptr to spawn npc on heap
             std::unique_ptr<Creature> npc(
                     new Creature(spawn.type, m_textures, m_fonts));
-            std::cout << spawn.type << " spawned in the world!" << std::endl;
             // set enemy pos to spawn pos
-            npc->setPosition(spawn.x, spawn.y);
+            npc->setPosition(spawn.vec2.x, spawn.vec2.y);
+            // print success and pos for confirmation
+            std::cout << spawn.type << " spawned in the world!" << " ("
+                << std::setprecision(0) << spawn.vec2.x << ", " << spawn.vec2.y
+                << ")\n";
+
             // bind to foreground layer
             m_scene_layers[Foreground]->attach_child(std::move(npc));
-            // remove spawn point from vec & keep iter for valid spawns
+            // riter, so pop_back end and "increment" backwards (moving to begin
+            // until vector is empty and all spawn points have been spawned)
             m_npc_spawn_points.pop_back();
         }
     }
 }
 
-void World::add_npc(Creature::Type type, float x_rel, float y_rel)
+/**
+ * Adds ONE NPC at a time to m_npc_spawn_points.
+ * @param Creature::Type type
+ * The type of the Creature to be added.
+ * @param const sf::Vector2& vec2_rel
+ * The relative position (to the Player) of the Creature to be added.
+ * @todo Should vec2_rel be const or not?
+ * @attention Used by add_npcs() to add ALL NPCs. Is an abstraction, to be
+ * reused.
+ * @see add_npcs()
+ */
+void World::add_npc(Creature::Type type, sf::Vector2f& vec2_rel)
 {
     // spawn with enemy type, spawn pos + player pos -> to spawn rel to player
-    SpawnPoint spawn(type, m_player_spawn_point.x + x_rel,
-            m_player_spawn_point.y - y_rel);
+    sf::Vector2f rel{m_player_spawn_point.x + vec2_rel.x,
+        m_player_spawn_point.y + vec2_rel.y};
+    SpawnPoint spawn(type, rel);
     // after init spawn with enemy type and pos of spawn, push into spawn point
     // vec
     m_npc_spawn_points.push_back(spawn);
@@ -260,30 +277,37 @@ void World::add_npc(Creature::Type type, float x_rel, float y_rel)
 }
 
 /**
- * Adds NPCs to m_npc_spawn_points.
- * @note Sorts NPCs (to be spawned) in ascending order.
- * @remark Does NOT SPAWN NPCs.
- * @see spawn_npcs().
+ * Adds ALL NPCs to be spawned to m_npc_spawn_points.
  * @note Uses add_npc() abstraction to add NPCs to m_npc_spawn_points.
  * @see add_npc().
+ * @note Sorts NPCs in descending order, based on y-axis.
+ * @remark Does NOT SPAWN NPCs.
+ * @see spawn_npcs().
  */
 void World::add_npcs()
 {
-    add_npc(Creature::Bunny, 0.f, 0.f);
-    add_npc(Creature::Bear, 0.f, 0.f);
+    sf::Vector2f bunny_spawn{20.f, 50.f};
+    sf::Vector2f bear_spawn{100.f, 200.f};
+    //add_npc(Creature::Bunny, bunny_spawn);
+    //add_npc(Creature::Bear, bear_spawn);
+
 
     // sort enemy spawn points so they can be iter through in an expected way
     std::sort(m_npc_spawn_points.begin(), m_npc_spawn_points.end(), []
             (SpawnPoint lhs, SpawnPoint rhs) {
-        // sorting algorithm used - ascending sort
-        return (lhs.y < rhs.y && lhs.x < rhs.x);
+        // sorting algorithm used - descending sort, based on y-axis
+        return (lhs.vec2.y < rhs.vec2.y);
     });
 }
 
 /**
-/// Destroys entities outside current world chunk, to reduce resource strain.
+ * Destroys Entity(ies) outside current world chunk, to reduce resource strain.
+ * @warning NOT USED.
+ * @todo Decide whether to implement chunk system or not?
+ */
 void World::destroy_entities_outside_chunk()
 {
+    /*
     Command command;
     /// Entities to be destroyed: Projectile and EnemyNpc.
     command.category = Category::Projectile | Category::EnemyNpc;
@@ -294,8 +318,9 @@ void World::destroy_entities_outside_chunk()
     });
     /// Push destroy() command into command queue.
     m_command_queue.push(command);
+    */
 }
-*/
+
 
 /** Helper function that determines if the colliding scene nodes match certain
  * expected categories.

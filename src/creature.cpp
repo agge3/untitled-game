@@ -10,6 +10,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 /// Anonymous namespace to avoid name collisions in other files - store Creature
 /// data TABLE local to Creature.
@@ -45,18 +46,28 @@ Creature::Creature(Type type, const TextureHolder& textures,
         create_pickup(node, textures);
     };
 
-    /// Smart pointer to TextNode on the heap is initialized in default constructor,
-    /// for health display (and other text info...).
+    /** @brief Smart pointer to TextNode on the heap is initialized in default
+     * constructor, for health display (and other text info...).
+     * @note TextNode is suspect for errors. Has exception handling, is wrapped
+     * in try-block. */
     // create text node & attach to creature - health display
-    std::unique_ptr<TextNode> health_display(new TextNode(fonts, ""));
-    m_health_display = health_display.get(); // mem ptr that points to node
-    attach_child(std::move(health_display));
+    try {
+        std::unique_ptr<TextNode> health_display(new TextNode(fonts, ""));
+        m_health_display = health_display.get(); // mem ptr that points to node
+        attach_child(std::move(health_display));
+        // print success to match expected text nodes with expected creatures
+        std::cout << "Text node initialized\n";
+    } catch (std::exception& e) {
+        std::cerr << "\nexception: " << e.what() << std::endl;
+    }
 
     /// @todo Implement specific text info for player.
     //if (get_category() == Player) {
         // do special things for player
     //}
 
+    // print success to match expected text updates with expected creatures
+    std::cout << "Text for creature updated\n";
     update_texts();
 }
 
@@ -103,7 +114,7 @@ void Creature::update_pathing(sf::Time delta_time)
     // enemy creature - pathing
     // const ref to directions defined in data table
     const std::vector<Direction>& DIRECTIONS = TABLE[m_type].directions;
-    if (!DIRECTIONS.empty()) { // do nothing if no directions\
+    if (!DIRECTIONS.empty()) { // do nothing if no directions
         // wait for travelled distance to be greater than defined pathing
         if (m_travelled_distance > DIRECTIONS[m_direction_index].distance) {
             // using modulo allows restarting and cycling through directions vec
@@ -186,6 +197,10 @@ void Creature::update_texts()
 {
     // catting str with '+'...?
     m_health_display->set_string(std::to_string(get_hitpoints()) + " HP");
+    // print success to make sure this is only done once!
+    std::cout << "Update texts: Health display text set ... success!\n"
+        // and shows the correct string...
+        << "Text: " << std::to_string(get_hitpoints()) << " HP\n";
     m_health_display->setPosition(0.f, 50.f);
     // -rotation negates any rotation of creature and keeps text upright
     m_health_display->setRotation(-getRotation());

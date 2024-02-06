@@ -8,11 +8,14 @@
 #include <iostream>
 #include <stdexcept>
 
-struct CreatureMover {
-    CreatureMover(float vx, float vy) : velocity(vx, vy) {}
-    void operator() (Creature& creature, sf::Time) const
+struct PlayerMover {
+    PlayerMover(float vx, float vy) : velocity(vx, vy) {}
+    void operator() (Creature& player, sf::Time) const
     {
-        creature.accelerate(velocity);
+        player.accelerate(velocity * player.get_max_speed());
+        // uncomment to print current player velocity
+        std::cout << "Player velocity: (" << velocity.x * player.get_max_speed()
+            << ", " << velocity.y * player.get_max_speed() << ")\n";
     }
     sf::Vector2f velocity;
 };
@@ -22,9 +25,14 @@ Player::Player()
     /// Try to set initial keybindings.
     try {
         m_keybinding[sf::Keyboard::Up] = MoveUp;
+        std::cout << "Player keybind: Move up = Up arrow\n";
         m_keybinding[sf::Keyboard::Down] = MoveDown;
+        std::cout << "Player keybind: Move down = Down arrow\n";
         m_keybinding[sf::Keyboard::Left] = MoveLeft;
+        std::cout << "Player keybind: Move left = Left arrow\n";
         m_keybinding[sf::Keyboard::Right] = MoveRight;
+        std::cout << "Player keybind: Move right = Right arrow\n";
+
         // attack actions...
         m_keybinding[sf::Keyboard::Space] = MagicAttack;
         // set inital actionbindings
@@ -39,7 +47,7 @@ Player::Player()
         pair.second.category = Category::Player;
 }
 
-/// To check if real-time action and not event (i.e., player wants to assign key).
+/** To check if real-time action and not event (i.e., player wants to assign key). */
 void Player::handle_event(const sf::Event& event, CommandQueue& commands)
 {
     if (event.type == sf::Event::KeyPressed) {
@@ -52,23 +60,28 @@ void Player::handle_event(const sf::Event& event, CommandQueue& commands)
 
 void Player::handle_realtime_input(CommandQueue& commands)
 {
-    // traverse all assigned keys and check if they are pressed
+    /** @brief Traverses all assigned keys and checks if they are pressed. */
     for (auto pair : m_keybinding) {
-        // if key is pressed, lookup action and trigger correspoding command
-        if (sf::Keyboard::isKeyPressed(pair.first) && is_realtime_action(pair.second))
-                commands.push(m_actionbinding[pair.second]);
+        /** @brief If key is pressed, lookup action and trigger correspoding
+         * command. */
+        if (sf::Keyboard::isKeyPressed(pair.first)
+                && is_realtime_action(pair.second)) {
+            // print detection of realtime input
+            std::cout << "Realtime input detected!\n";
+            commands.push(m_actionbinding[pair.second]);
+        }
     }
 }
 
 void Player::assign_key(Action action, sf::Keyboard::Key key)
 {
     // remove all keys that already map to action
-    // TODO: rewrite for loop
-    for (auto itr = m_keybinding.begin(); itr != m_keybinding.end(); ) {
-        if(itr->second == action)
-            m_keybinding.erase(itr++);
+    /** @todo Rewrite for loop. */
+    for (auto iter = m_keybinding.begin(); iter != m_keybinding.end(); ) {
+        if(iter->second == action)
+            m_keybinding.erase(iter++);
         else
-            ++itr;
+            ++iter;
     }
     // insert new binding
     m_keybinding[key] = action;
@@ -91,20 +104,27 @@ char* Player::print_assigned_key(Action action) const
 }
 
 /**
- * @note Will atack every frame.
+ * @attention Player speed is obtained from data_tables.cpp. Correct direction
+ * is achieved by multiplying by positive or negative one on the correct axis.
+ * @see PlayerMover, Creature::get_max_speed(), data_tables.cpp
+ * @note Will attack every frame.
  * @see Creature::check_projectile_launch() to sync with delta time.
  */
 void Player::initialize_actions() {
-    float PLAYER_SPEED = 75.f;
-    /// Movement commands increment and decrement player speed.
-    m_actionbinding[MoveLeft].action = derived_action<Creature>(
-            CreatureMover(-PLAYER_SPEED, 0.f));
-	m_actionbinding[MoveRight].action = derived_action<Creature>(
-            CreatureMover(+PLAYER_SPEED, 0.f));
+    /** Movement commands increment and decrement player speed. */
 	m_actionbinding[MoveUp].action = derived_action<Creature>(
-            CreatureMover(0.f, -PLAYER_SPEED));
+            PlayerMover(0.f, +1.f));
+    std::cout << "Player action: Move up\n";
 	m_actionbinding[MoveDown].action = derived_action<Creature>(
-            CreatureMover(0.f, +PLAYER_SPEED));
+            PlayerMover(0.f, +1.f));
+    std::cout << "Player action: Move down\n";
+    m_actionbinding[MoveLeft].action = derived_action<Creature>(
+            PlayerMover(-1.f, 0.f));
+    std::cout << "Player action: Move left\n";
+	m_actionbinding[MoveRight].action = derived_action<Creature>(
+            PlayerMover(+1.f, 0.f));
+    std::cout << "Player action: Move right\n";
+
     // attack actions...
     // std::bind binds the para "_1" to always be the para for &attack ...
     // -> Creature::attack(std::placeholders::_1);
@@ -114,26 +134,25 @@ void Player::initialize_actions() {
     // guards to properly attack based on delta time
 }
 
+/**
+ * Checks if real-time action (immediate action), as opposed to queued action.
+ * @return TRUE if real-time action, FALSE if not.
+ * @note Default is FALSE. If an action is not explicitly defined as real-time,
+ * then it is not to be handled as real-time.
+ */
 bool Player::is_realtime_action(Action action)
 {
-    // all actions to be handled realtime...
+    // all actions to be handled real-time...
     switch (action) {
     case MoveUp:
-        return true;
-        break;
     case MoveDown:
-        return true;
-        break;
     case MoveLeft:
-        return true;
-        break;
     case MoveRight:
-        return true;
-        break;
     case MagicAttack:
         return true;
         break;
-    // if not explicitly defined as realtime, return false -> don't handle realtime
+    // if not explicitly defined as real-time, return false -> don't handle
+    // as real-time
     default:
         return false;
         break;

@@ -3,7 +3,7 @@
  * @copyright See LICENSE in the top level directory
  * @file main.cpp
  * @purpose A fun and untitled game
- * @developers agge3
+ * @author agge3
  */
 
 #include "app.h"
@@ -27,6 +27,6 @@ int main()
         Application app;
         app.run();
     } catch (std::exception& e) {
-        std::cerr << "\nEXCEPTION: " << e.what() << std::endl;
+        std::cerr << "\nexception: " << e.what() << std::endl;
     }
 }

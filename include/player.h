@@ -12,7 +12,7 @@ class CommandQueue;
 
 /**
  * @class Player
- * Controls input handling of player entity.
+ * Controls input handling of Player Creature.
  */
 class Player {
 public:
@@ -20,7 +20,7 @@ public:
      * @enum Action
      * Player actions - to allow keybinding.
      */
-    enum Action : unsigned int {
+    enum Action {
         None = 0,
         MoveUp = 1 << 0,
         MoveDown = 1 << 1,
@@ -50,12 +50,12 @@ public:
     void handle_event(const sf::Event& event, CommandQueue& commands);
     // for real-time input
     void handle_realtime_input(CommandQueue& commands);
-    // func to bind keys & get assigned keys
+    // fn to bind keys and get assigned keys
     void assign_key(Action action, sf::Keyboard::Key key);
     sf::Keyboard::Key get_assigned_key(Action action) const;
     void set_level_status(LevelStatus status);
     void get_level_status() const;
-    /// TODO: Returns nullptr until implemented.
+    /** @todo Returns nullptr until implemented. */
     char* print_assigned_key(Action action) const;
 private:
     void initialize_actions();

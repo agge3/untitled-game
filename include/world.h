@@ -59,14 +59,14 @@ private:
 
     /**
      * @struct SpawnPoint
-     * Spawn point struct, with creature type and (x, y) coordinates for spawn.
+     * Spawn point struct, with Creature::Type and sf::Vector2f (x, y)
+     * coordinates for spawn.
      */
     struct SpawnPoint {
-        SpawnPoint(Creature::Type type, float x, float y) :
-            type(type), x(x), y(y) {}
+        SpawnPoint(Creature::Type type, sf::Vector2f& vec2) :
+            type(type), vec2(vec2) {}
         Creature::Type type;
-        float x;
-        float y;
+        sf::Vector2f vec2;
     };
 
     void load_textures();
@@ -75,9 +75,9 @@ private:
 	void adapt_player_velocity();
     void handle_collisions();
     void add_npcs();
-    void add_npc(Creature::Type type, float x_rel, float y_rel);
+    void add_npc(Creature::Type type, sf::Vector2f& vec2_rel);
     void spawn_npcs();
-    //void destroy_entities_outside_chunk();
+    void destroy_entities_outside_chunk();
     // void guide_projectiles();
     bool matches_categories(SceneNode::Pair& colliders, Category::Type type1,
             Category::Type type2) const;

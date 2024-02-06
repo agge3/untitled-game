@@ -6,7 +6,10 @@ GameState::GameState(StateStack& stack, Context context) :
     State(stack, context),
     m_world(*context.window, *context.fonts),
     m_player(*context.player)
-{}
+{
+    // print successful state creation
+    std::cout << "Game stated created!\n";
+}
 
 void GameState::draw()
 {
@@ -31,7 +34,8 @@ bool GameState::handle_event(const sf::Event& event)
     m_player.handle_event(event, commands);
 
     /// If escape pressed, push pause state as current state.
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+    if (event.type == sf::Event::KeyPressed
+            && event.key.code == sf::Keyboard::Escape)
         request_push_stack(States::Pause);
 
     return true;

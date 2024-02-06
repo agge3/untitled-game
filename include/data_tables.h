@@ -1,3 +1,10 @@
+/**
+ * @project untitled game
+ * @copyright See LICENSE in the top level directory
+ * @file data_tables.h
+ * @developers agge3
+ */
+
 #pragma once
 
 #include "entity.h"

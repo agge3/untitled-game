@@ -96,25 +96,29 @@ bool SettingsState::handle_event(const sf::Event& event)
         switch (m_action) {
         case Player::Action::MoveUp: {
             std::cout << "\"Move up\" has been assigned" << std::endl;
-            get_context().player->assign_key(Player::Action::MoveUp, event.key.code);
+            get_context().player->assign_key(Player::Action::MoveUp,
+                    event.key.code);
             m_assigning_keys = false;
             break;
             }
         case Player::Action::MoveDown: {
             std::cout << "\"Move down\" has been assigned" << std::endl;
-            get_context().player->assign_key(Player::Action::MoveDown, event.key.code);
+            get_context().player->assign_key(Player::Action::MoveDown,
+                    event.key.code);
             m_assigning_keys = false;
             break;
             }
         case Player::Action::MoveLeft: {
             std::cout << "\"Move left\" has been assigned" << std::endl;
-            get_context().player->assign_key(Player::Action::MoveLeft, event.key.code);
+            get_context().player->assign_key(Player::Action::MoveLeft,
+                    event.key.code);
             m_assigning_keys = false;
             break;
             }
         case Player::Action::MoveRight: {
             std::cout << "\"Move right\" has been assigned" << std::endl;
-            get_context().player->assign_key(Player::Action::MoveRight, event.key.code);
+            get_context().player->assign_key(Player::Action::MoveRight,
+                    event.key.code);
             m_assigning_keys = false;
             break;
             }
