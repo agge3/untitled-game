@@ -77,7 +77,7 @@ private:
     void add_npcs();
     void add_npc(Creature::Type type, float x_rel, float y_rel);
     void spawn_npcs();
-    void destroy_entities_outside_chunk();
+    //void destroy_entities_outside_chunk();
     // void guide_projectiles();
     bool matches_categories(SceneNode::Pair& colliders, Category::Type type1,
             Category::Type type2) const;

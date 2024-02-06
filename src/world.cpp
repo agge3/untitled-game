@@ -47,7 +47,7 @@ void World::update(sf::Time delta_time)
     m_player_creature->set_velocity(0.f, 0.f);
 
     /// Setup commands to destroy entities if outside world chunk.
-    destroy_entities_outside_chunk();
+    //destroy_entities_outside_chunk();
 
     /// Forward commands to the scene graph and adapt player velocity correctly.
     while (!m_command_queue.is_empty())
@@ -184,6 +184,7 @@ C/C++ Header                     1              0              1   n ascending o
  */
 void World::spawn_npcs()
 {
+    /** @todo Decide on whether to implement world chunks or not.
     // if there's avail spawn points...
     if (!m_npc_spawn_points.empty()) {
         // iter through spawn points until at current world chunk (...lowest
@@ -191,10 +192,10 @@ void World::spawn_npcs()
         for (auto iter = m_npc_spawn_points.begin();
                 iter != m_npc_spawn_points.end(); ++iter) {
             // if spawn points are within current world chunk...
-            /* MATH: spawn.x > chunk.left
+            MATH: spawn.x > chunk.left
             && spawn.x < (chunk.left + chunk.size.x)
             && spawn.y < chunk.top
-            && spawn.y > (chunk.top - chunk.size.y) */
+            && spawn.y > (chunk.top - chunk.size.y)
             if (iter->x > get_chunk_bounds().left
                     && iter->x < (get_chunk_bounds().left
                         + get_chunk_bounds().getSize().x)
@@ -218,6 +219,31 @@ void World::spawn_npcs()
             }
             // TODO: break out of loop when spawn point > chunk to not do
             // unneccesary iter
+        }
+    }
+    */
+    // print size of npc spawn points vector, for debug
+    std::cout << "Size of npc spawn points vector: " << m_npc_spawn_points.size()
+        << "\n";
+    // if npc spawn points vector is not empty...
+    if (!m_npc_spawn_points.empty()) {
+        // iter through each spawn point and spawn
+        for (auto iter = m_npc_spawn_points.rbegin();
+                iter != m_npc_spawn_points.rend(); ++iter) {
+            // print each iter to confirm with size, for debug
+            //std::cout << m_npc_spawn_points.at(iter) << "\n";
+            // init SpawnPoint AFTER check to not create unneccesary structs
+            SpawnPoint spawn = *iter;
+            // create smart ptr to spawn npc on heap
+            std::unique_ptr<Creature> npc(
+                    new Creature(spawn.type, m_textures, m_fonts));
+            std::cout << spawn.type << " spawned in the world!" << std::endl;
+            // set enemy pos to spawn pos
+            npc->setPosition(spawn.x, spawn.y);
+            // bind to foreground layer
+            m_scene_layers[Foreground]->attach_child(std::move(npc));
+            // remove spawn point from vec & keep iter for valid spawns
+            m_npc_spawn_points.pop_back();
         }
     }
 }
@@ -254,6 +280,7 @@ void World::add_npcs()
     });
 }
 
+/**
 /// Destroys entities outside current world chunk, to reduce resource strain.
 void World::destroy_entities_outside_chunk()
 {
@@ -268,6 +295,7 @@ void World::destroy_entities_outside_chunk()
     /// Push destroy() command into command queue.
     m_command_queue.push(command);
 }
+*/
 
 /** Helper function that determines if the colliding scene nodes match certain
  * expected categories.
