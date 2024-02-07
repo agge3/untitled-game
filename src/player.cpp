@@ -8,6 +8,8 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std::placeholders;
+
 struct PlayerMover {
     PlayerMover(float vx, float vy) : velocity(vx, vy) {}
     void operator() (Creature& player, sf::Time) const
@@ -20,7 +22,11 @@ struct PlayerMover {
     sf::Vector2f velocity;
 };
 
-Player::Player()
+/**
+ * @note Default LevelStatus of Player is InProgress. Initialized in default
+ * constructor.
+ */
+Player::Player() : m_current_level_status(InProgress)
 {
     /// Try to set initial keybindings.
     try {
@@ -42,9 +48,13 @@ Player::Player()
         std::cerr << "\n EXCEPTION: " << e.what() <<
             ". Failed to initialize default player keybinds" << std::endl;
     }
-    // assign all categories to player's entity
-    for (auto& pair : m_actionbinding)
+    /** @brief All categories assigned to Player Creature. */
+    for (auto& pair : m_actionbinding) {
+        // uncomment to print successful action category assigned to player
+        // category
+        std::cout << "Action category assigned to player category\n";
         pair.second.category = Category::Player;
+    }
 }
 
 /** To check if real-time action and not event (i.e., player wants to assign key). */
@@ -129,7 +139,7 @@ void Player::initialize_actions() {
     // std::bind binds the para "_1" to always be the para for &attack ...
     // -> Creature::attack(std::placeholders::_1);
     m_actionbinding[MagicAttack].action = derived_action<Creature>(
-            std::bind(&Creature::attack, std::placeholders::_1));
+            std::bind(&Creature::attack, _1));
     // Creature::check_projectile_launch() ->
     // guards to properly attack based on delta time
 }
@@ -157,4 +167,21 @@ bool Player::is_realtime_action(Action action)
         return false;
         break;
     }
+}
+
+/**
+ * Use to set current LevelStatus of Player.
+ */
+void set_level_status(LevelStatus status)
+{
+    m_current_level_status = status;
+}
+
+/**
+ * Use to get current LevelStatus of Player.
+ * @return m_current_level_status, enum of LevelStatus.
+ */
+LevelStatus get_level_status() const
+{
+    return m_current_level_status;
 }

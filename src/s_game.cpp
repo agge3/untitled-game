@@ -23,6 +23,8 @@ bool GameState::update(sf::Time delta_time)
     /// Get commands from command queue, then handle input.
     CommandQueue& commands = m_world.get_command_queue();
     m_player.handle_realtime_input(commands);
+    // uncomment to print if game update loop is handling realtime input
+    //std::cout << "Game update loop: Receiving realtime input!\n";
 
     return true;
 }

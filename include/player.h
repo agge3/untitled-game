@@ -77,5 +77,9 @@ private:
      */
     std::map<Action, Command> m_actionbinding;
 
+    /**
+     * @var LevelStatus m_current_level_status
+     * Holds current level status of Player.
+     */
     LevelStatus m_current_level_status;
 };
