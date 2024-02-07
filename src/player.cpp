@@ -121,19 +121,20 @@ char* Player::print_assigned_key(Action action) const
  * @see Creature::check_projectile_launch() to sync with delta time.
  */
 void Player::initialize_actions() {
-    /** Movement commands increment and decrement player speed. */
+    /** @brief Movement commands increment and decrement player speed. */
+    // @note y-axis up/down pos/neg is inverse!
 	m_actionbinding[MoveUp].action = derived_action<Creature>(
-            PlayerMover(0.f, +1.f));
-    std::cout << "Player action: Move up\n";
+            PlayerMover(0.f, -1.f));
+    std::cout << "Player action initialized: Move up\n";
 	m_actionbinding[MoveDown].action = derived_action<Creature>(
             PlayerMover(0.f, +1.f));
-    std::cout << "Player action: Move down\n";
+    std::cout << "Player action initialized: Move down\n";
     m_actionbinding[MoveLeft].action = derived_action<Creature>(
             PlayerMover(-1.f, 0.f));
-    std::cout << "Player action: Move left\n";
+    std::cout << "Player action initialized: Move left\n";
 	m_actionbinding[MoveRight].action = derived_action<Creature>(
             PlayerMover(+1.f, 0.f));
-    std::cout << "Player action: Move right\n";
+    std::cout << "Player action initialized: Move right\n";
 
     // attack actions...
     // std::bind binds the para "_1" to always be the para for &attack ...
@@ -172,7 +173,7 @@ bool Player::is_realtime_action(Action action)
 /**
  * Use to set current LevelStatus of Player.
  */
-void set_level_status(LevelStatus status)
+void Player::set_level_status(LevelStatus status)
 {
     m_current_level_status = status;
 }
@@ -181,7 +182,7 @@ void set_level_status(LevelStatus status)
  * Use to get current LevelStatus of Player.
  * @return m_current_level_status, enum of LevelStatus.
  */
-LevelStatus get_level_status() const
+Player::LevelStatus Player::get_level_status() const
 {
     return m_current_level_status;
 }

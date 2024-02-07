@@ -67,7 +67,7 @@ void World::update(sf::Time delta_time)
 
     /// Regular game update step, adapt player position (correct even though
     /// outside view, because adapt_player_position() handles appropriately).
-    m_scene_graph.update(delta_time);
+    m_scene_graph.update(delta_time, m_command_queue);
     adapt_player_position();
 }
 
@@ -91,6 +91,7 @@ void World::load_textures()
     m_textures.load(Textures::Grass, "textures/world/grass1.png");
 
     m_textures.load(Textures::Player, "textures/player/player.png");
+    m_textures.load(Textures::FireProjectile, "textures/player/player.png");
 
     m_textures.load(Textures::Bunny, "textures/player/player.png");
     m_textures.load(Textures::Bear, "textures/player/player.png");
@@ -290,7 +291,6 @@ void World::add_npcs()
     sf::Vector2f bear_spawn{100.f, 200.f};
     //add_npc(Creature::Bunny, bunny_spawn);
     //add_npc(Creature::Bear, bear_spawn);
-
 
     // sort enemy spawn points so they can be iter through in an expected way
     std::sort(m_npc_spawn_points.begin(), m_npc_spawn_points.end(), []

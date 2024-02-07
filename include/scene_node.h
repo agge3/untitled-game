@@ -19,8 +19,10 @@ namespace sf {
     class RenderTarget;
 }
 
-/// Forward declaration of Command to be used in implementation.
+/** @brief Forward declaration of Command to be used in implementation. */
 struct Command;
+/** @brief Forward declaration of CommandQueue to be used in implementation. */
+struct CommandQueue;
 
 class SceneNode :
     public sf::Transformable, // store its curr pos, rotatation,
@@ -40,12 +42,12 @@ public:
      */
     typedef std::pair<SceneNode*, SceneNode*> Pair;
 
-    SceneNode();
+    explicit SceneNode(Category::Type category = Category::None);
 
     void attach_child(Ptr child);
     Ptr detach_child(const SceneNode& node);
     // update scene
-    void update(sf::Time delta_time);
+    void update(sf::Time delta_time, CommandQueue& commands);
     // absolute transformations
     sf::Transform get_world_transform() const;
     sf::Vector2f get_world_position() const;
@@ -68,13 +70,14 @@ private:
         const;
     void draw_children(sf::RenderTarget& target, sf::RenderStates states) const;
     // update parent
-    virtual void update_current(sf::Time dt);
-    void update_children(sf::Time dt);
+    virtual void update_current(sf::Time dt, CommandQueue& commands);
+    void update_children(sf::Time dt, CommandQueue& commands);
     void draw_bounding_rect(sf::RenderTarget& target, sf::RenderStates states)
         const;
 
     std::vector<Ptr> m_children;
     SceneNode* m_parent;
+    Category::Type m_default_category;
 };
 
 bool collision(const SceneNode& lhs, const SceneNode& rhs);

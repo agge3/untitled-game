@@ -104,12 +104,29 @@ void Creature::draw_current(sf::RenderTarget& target, sf::RenderStates states)
     target.draw(m_sprite, states);
 }
 
-void Creature::update_current(sf::Time delta_time, CommandQueue& commands)
+/**
+ * Update the current Creature.
+ */
+void Creature::update_current(sf::Time dt, CommandQueue& commands)
 {
-    /// @todo Implement.
+    /** @note Checks if Creature is_destroyed() first, if is_destroyed() RNG
+     * check_pickup_drop() and is_marked_for_removal(). */
+    if (is_destroyed()) {
+        check_pickup_drop(commands);
+        m_is_marked_for_removal = true;
+    } else {
+        /** @brief check_projectile_launch() to check if attack(s) should be
+         * updated. */
+        check_projectile_launch(dt, commands);
+        /** @brief Update Creature pathing and apply velocity. */
+        update_pathing(dt);
+        Entity::update_current(dt, commands);
+        /** @brief Update Creature texts. */
+        update_texts();
+    }
 }
 
-void Creature::update_pathing(sf::Time delta_time)
+void Creature::update_pathing(sf::Time dt)
 {
     // enemy creature - pathing
     // const ref to directions defined in data table
@@ -136,7 +153,19 @@ void Creature::update_pathing(sf::Time delta_time)
         std::cout << "Velocity of creature: " << vx << "x*" << vy << "y"
             << std::endl;
         // distance travelled = speed * time
-        m_travelled_distance += get_max_speed() * delta_time.asSeconds();
+        m_travelled_distance += get_max_speed() * dt.asSeconds();
+    }
+}
+
+/**
+ * RNG to determine if NPC should drop Pickup.
+ * @see random_int() for RNG implementation.
+ */
+void Creature::check_pickup_drop(CommandQueue& commands)
+{
+    /** @attention Enemy(ies) have 1/3 chance to drop Pickup. */
+    if (!is_allied() && random_int(3) == 0) {
+        commands.push(m_drop_pickup_command);
     }
 }
 

@@ -1,6 +1,7 @@
 #include "scene_node.h"
 #include "command.h"
 #include "utility.h"
+#include "command_queue.h"
 
 /// RenderTarget, RectangleShape, and Color only needed locally for the
 /// implementation of get_bounding_rect().
@@ -18,7 +19,8 @@
  * and (3) iterating through the set to differentiate between the collision's
  * categories
  */
-SceneNode::SceneNode() : m_children(), m_parent(nullptr) {}
+SceneNode::SceneNode(Category::Type category) :
+    m_children(), m_parent(nullptr), m_default_category(category) {}
 // https://stackoverflow.com/questions/45583473/include-errors-detected-in-vscode
 
 void SceneNode::attach_child(Ptr child) {
@@ -45,21 +47,21 @@ SceneNode::Ptr SceneNode::detach_child(const SceneNode& node)
 }
 
 /// Public update interface for private update fn.
-void SceneNode::update(sf::Time dt)
+void SceneNode::update(sf::Time dt, CommandQueue& commands)
 {
-    update_current(dt);
-    update_children(dt);
+    update_current(dt, commands);
+    update_children(dt, commands);
 }
 
-void SceneNode::update_current(sf::Time)
+void SceneNode::update_current(sf::Time, CommandQueue&)
 {
     // do nothing by default
 }
 
-void SceneNode::update_children(sf::Time delta_time)
+void SceneNode::update_children(sf::Time dt, CommandQueue& commands)
 {
     for (Ptr& child : m_children)
-        child->update(delta_time);
+        child->update(dt, commands);
 }
 
 void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const

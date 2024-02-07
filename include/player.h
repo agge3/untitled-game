@@ -8,6 +8,7 @@
 
 #include <map>
 
+/** @brief Forward definition of CommandQueue to be used in implementation. */
 class CommandQueue;
 
 /**
@@ -20,7 +21,7 @@ public:
      * @enum Action
      * Player actions - to allow keybinding.
      */
-    enum Action {
+    enum Action : unsigned int {
         None = 0,
         MoveUp = 1 << 0,
         MoveDown = 1 << 1,
@@ -38,8 +39,9 @@ public:
      * @enum LevelStatus
      * Current level status.
      */
-    enum class LevelStatus {
-        None = 0,
+    enum LevelStatus : unsigned int {
+        /** @todo Migrate to enum class. */
+        //None = 0,
         InProgress = 1 << 0,
         Success = 1 << 1,
         Failure = 1 << 2,
@@ -54,7 +56,7 @@ public:
     void assign_key(Action action, sf::Keyboard::Key key);
     sf::Keyboard::Key get_assigned_key(Action action) const;
     void set_level_status(LevelStatus status);
-    void get_level_status() const;
+    LevelStatus get_level_status() const;
     /** @todo Returns nullptr until implemented. */
     char* print_assigned_key(Action action) const;
 private:
