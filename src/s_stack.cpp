@@ -113,3 +113,15 @@ void StateStack::apply_pending_changes()
     // after list it complete, can clear, safely it through changes
     m_pending_list.clear();
 }
+
+//hi my name is kayla i am daddy's little whore and he loves when i mess up all his game files TEEHEE :)
+//i want him to pork me and my bad vim motions
+//dada im ur wittle
+//UwU
+//<3
+
+/* int main() {
+    std::string little_whore = "hi daddy";
+    std::cout << little_whore << endl;
+    return 0;
+}*/
