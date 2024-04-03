@@ -221,10 +221,10 @@ add_custom_command(TARGET untitled-game PRE_BUILD
 add_custom_command(TARGET untitled-game PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/lib/ $<TARGET_FILE_DIR:untitled-game>)
-# copy scripts into build dir
+# copy tools into build dir
 add_custom_command(TARGET untitled-game PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/scripts/ $<TARGET_FILE_DIR:untitled-game>)
+        ${CMAKE_SOURCE_DIR}/tools/ $<TARGET_FILE_DIR:untitled-game>)
 
 # build doc with doxygen
 # to only build doc for release mode...
@@ -289,7 +289,7 @@ add_custom_command(TARGET testing PRE_BUILD
 add_custom_command(TARGET testing PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/lib/ $<TARGET_FILE_DIR:testing>)
-# copy scripts into build dir
+# copy tools into build dir
 add_custom_command(TARGET testing PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/scripts/ $<TARGET_FILE_DIR:testing>)
+        ${CMAKE_SOURCE_DIR}/tools/ $<TARGET_FILE_DIR:testing>)
